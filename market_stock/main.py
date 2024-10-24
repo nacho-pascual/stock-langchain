@@ -1,21 +1,47 @@
-
-
+import os
 import requests
 
 
 from utils import get_date_from, get_date_to
+from dotenv import load_dotenv
 
 
-def get_stock_info(exchange, stock, date_from=get_date_from() , date_to=get_date_to()):
+load_dotenv()
+MARKET_API_KEY = os.getenv("MARKET_API_KEY")
 
 
+def get_stock_info(exchange=None, stock=None, date_from=get_date_from() , date_to=get_date_to()):
+    url = f"https://api.marketstack.com/v1/eod?access_key={MARKET_API_KEY}"
 
-url = "https://api.marketstack.com/v1/eod?access_key={PASTE_YOUR_API_KEY_HERE}"
+    querystring = {"symbols":"AAPL"}
+    response = requests.get(url, params=querystring)
+    return response.json()
 
-querystring = {"symbols":"AAPL"}
 
-response = requests.get(url, params=querystring)
+def parse_market_response(market_response):
+    stock_values = []
+    for data_content in market_response["data"]:
+        stock_content_dict = {
+                              "symbol": data_content["symbol"],
+                              "exchange": data_content["exchange"],
+                              "date": data_content["date"],
+                              "open": data_content["open"],
+                              "high": data_content["high"],
+                              "low": data_content["low"],
+                              "close": data_content["close"],
+                              "volume": data_content["volume"]
+                            }
+        stock_values.append(stock_content_dict)
+    return stock_values
 
-print(response.json())
+
 
 if __name__ == "__main__": 
+    market_response = get_stock_info(date_from="2024-10-23")
+    stock_values_list = parse_market_response(market_response)
+    print(stock_values_list)     
+
+
+
+
+   
