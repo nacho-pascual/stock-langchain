@@ -13,7 +13,13 @@ MARKET_API_KEY = os.getenv("MARKET_API_KEY")
 def get_stock_info(exchange=None, stock=None, date_from=get_date_from() , date_to=get_date_to()):
     url = f"https://api.marketstack.com/v1/eod?access_key={MARKET_API_KEY}"
 
-    querystring = {"symbols":"AAPL"}
+    querystring = {
+                    "symbols":stock,
+                    "exchange":exchange,
+                    "date_from":date_from,
+                    "date_to":date_to,
+                    "interval":"10min"
+                    }
     response = requests.get(url, params=querystring)
     return response.json()
 
@@ -37,7 +43,7 @@ def parse_market_response(market_response):
 
 
 if __name__ == "__main__": 
-    market_response = get_stock_info(date_from="2024-10-23")
+    market_response = get_stock_info(exchange="XNAS", stock="AAPL", date_from=get_date_from() , date_to=get_date_to())
     stock_values_list = parse_market_response(market_response)
     print(stock_values_list)     
 
